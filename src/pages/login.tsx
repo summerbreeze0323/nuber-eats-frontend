@@ -1,6 +1,7 @@
 import React from 'react';
 import { useForm } from 'react-hook-form';
 import { gql, useMutation } from "@apollo/client";
+import Helmet from 'react-helmet';
 import { FormError } from '../components/form-error';
 import { login, loginVariables } from '../__generated__/login';
 import nuberLogo from '../images/logo.svg';
@@ -52,6 +53,9 @@ export const Login = () => {
 
   return (
     <div className="h-screen flex items-center flex-col mt-10 lg:mt-28">
+      <Helmet>
+        <title>Login | Nuber Eats</title>
+      </Helmet>
       <div className="w-full max-w-screen-sm flex flex-col px-5 items-center">
         <img src={nuberLogo} className="w-52 mb-10" alt="nuber logo"/>
         <h4 className="w-full font-medium text-left text-3xl mb-5">Welcome back</h4>
