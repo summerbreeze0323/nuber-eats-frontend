@@ -1,5 +1,17 @@
 import React from 'react';
 import { useForm } from 'react-hook-form';
+import { gql, useMutation } from "@apollo/client";
+import { FormError } from '../components/form-error';
+
+const LOGIN_MUTATION = gql`
+  mutation PotatoMutation($email: String!, $password: String!) {
+    login(input: { email: $email, password: $password}) {
+      ok
+      token
+      error
+    }
+  }
+`;
 
 interface ILoginForm {
   email: string;
@@ -8,8 +20,12 @@ interface ILoginForm {
 
 export const Login = () => {
   const { register, getValues, errors, handleSubmit } = useForm<ILoginForm>();
+  const [loginMutation] = useMutation(LOGIN_MUTATION);
   const onSubmit = () => {
-    console.log(getValues())
+    const { email, password } = getValues();
+    loginMutation({
+      variables: { email, password: password }
+    });
   }
 
   return (
@@ -28,26 +44,20 @@ export const Login = () => {
             placeholder="Email"
           />
           {errors.email?.message && (
-            <span className="font-medium text-red-500">
-              {errors.email?.message}
-            </span>
+            <FormError errorMessage={errors.email?.message}/>
           )}
           <input
-            ref={register({ required: "Password is required", minLength: 10 })}
+            ref={register({ required: "Password is required" })}
             name="password"
             type="password"
             className="input"
             placeholder="Password"
           />
           {errors.password?.message && (
-            <span className="font-medium text-red-500">
-              {errors.password?.message}
-            </span>
+            <FormError errorMessage={errors.password?.message}/>
           )}
           {errors.password?.type === 'minLength' && (
-            <span className="font-medium text-red-500">
-              Password must be more than 10 chars.
-            </span>
+            <FormError errorMessage={"Password must be more than 10 chars."}/>
           )}
           <button className="btn">
             Log In
