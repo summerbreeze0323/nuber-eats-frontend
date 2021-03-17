@@ -1,13 +1,14 @@
 import React from 'react';
 import { useForm } from 'react-hook-form';
 import { gql, useMutation } from "@apollo/client";
-import Helmet from 'react-helmet';
+import { Helmet } from 'react-helmet-async';
 import { FormError } from '../components/form-error';
 import { login, loginVariables } from '../__generated__/login';
 import nuberLogo from '../images/logo.svg';
 import { Button } from '../components/button';
 import { Link } from 'react-router-dom';
-import { isLoggedInVal } from '../apollo';
+import { authToken, isLoggedInVal } from '../apollo';
+import { LOCALSTORAGE_TOKEN } from '../constants';
 
 const LOGIN_MUTATION = gql`
   mutation login($loginInput: LoginInput!) {
@@ -30,8 +31,9 @@ export const Login = () => {
   });
   const onCompleted = (data: login) => {
     const { login: { ok, token } } = data;
-    if (ok) {
-      console.log(token)
+    if (ok && token) {
+      localStorage.setItem(LOCALSTORAGE_TOKEN, token);
+      authToken(token);
       isLoggedInVal(true);
     }
   };

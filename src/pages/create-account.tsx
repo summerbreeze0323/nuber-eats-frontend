@@ -1,6 +1,6 @@
 import React from 'react';
 import { gql, useMutation } from "@apollo/client";
-import Helmet from 'react-helmet';
+import { Helmet } from 'react-helmet-async';
 import { Button } from '../components/button';
 import { useForm } from 'react-hook-form';
 import nuberLogo from '../images/logo.svg';
