@@ -7,7 +7,7 @@ import { login, loginVariables } from '../__generated__/login';
 import nuberLogo from '../images/logo.svg';
 import { Button } from '../components/button';
 import { Link } from 'react-router-dom';
-import { authToken, isLoggedInVal } from '../apollo';
+import { authTokenVal, isLoggedInVal } from '../apollo';
 import { LOCALSTORAGE_TOKEN } from '../constants';
 
 const LOGIN_MUTATION = gql`
@@ -33,7 +33,7 @@ export const Login = () => {
     const { login: { ok, token } } = data;
     if (ok && token) {
       localStorage.setItem(LOCALSTORAGE_TOKEN, token);
-      authToken(token);
+      authTokenVal(token);
       isLoggedInVal(true);
     }
   };
