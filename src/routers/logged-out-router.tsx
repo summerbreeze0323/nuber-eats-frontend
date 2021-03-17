@@ -1,15 +1,43 @@
 import React from 'react';
-import { isLoggedInVal } from '../apollo';
+import { useForm } from 'react-hook-form';
 
 export const LoggedOutRouter = () => {
-  const onClick = () => {
-    isLoggedInVal(true);
-  }
+  const { register, watch, handleSubmit, errors } = useForm();
+
+  const onSubmit = () => {
+    console.log(watch());
+  };
+
+  const onInvalid = () => {
+    console.log('cant create account');
+    console.log(errors);
+  };
 
   return (
     <div>
       <h1>Logged Out</h1>
-      <button onClick={onClick}>click to login</button>
+      <form onSubmit={handleSubmit(onSubmit, onInvalid)}>
+        <div>
+          <input
+            type="email"
+            name="email"
+            ref={register({
+              required: "This is required",
+              pattern: /^[A-Za-z0-9._%+-]+@gmail.com$/
+            })}
+            placeholder="email"
+          />
+        </div>
+        <div>
+          <input
+            type="password"
+            name="password"
+            ref={register({ required: true })}
+            placeholder="password"
+          />
+        </div>
+        <button className="bg-yellow-300 text-white">Submit</button>
+      </form>
     </div>
   )
 };
