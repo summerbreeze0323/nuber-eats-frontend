@@ -7,6 +7,7 @@ import { login, loginVariables } from '../__generated__/login';
 import nuberLogo from '../images/logo.svg';
 import { Button } from '../components/button';
 import { Link } from 'react-router-dom';
+import { isLoggedInVal } from '../apollo';
 
 const LOGIN_MUTATION = gql`
   mutation login($loginInput: LoginInput!) {
@@ -31,6 +32,7 @@ export const Login = () => {
     const { login: { ok, token } } = data;
     if (ok) {
       console.log(token)
+      isLoggedInVal(true);
     }
   };
 
@@ -64,14 +66,17 @@ export const Login = () => {
           onSubmit={handleSubmit(onSubmit)}
         >
           <input
-            ref={register({ required: "Email is required" })}
+            ref={register({
+              required: "Email is required",
+              pattern: /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
+            })}
             name="email"
             type="email"
             className="input"
             placeholder="Email"
           />
-          {errors.email?.message && (
-            <FormError errorMessage={errors.email?.message}/>
+          {errors.email?.type === "pattern" && (
+            <FormError errorMessage={"Please enter a valid email"} />
           )}
           <input
             ref={register({ required: "Password is required" })}
