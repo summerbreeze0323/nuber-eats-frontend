@@ -1,8 +1,10 @@
 import { gql, useQuery } from '@apollo/client';
 import React, { useState } from 'react';
+import { Helmet } from 'react-helmet-async';
 import { useForm } from 'react-hook-form';
 import { useHistory } from 'react-router';
 import { Restaurant } from '../../components/restaurant';
+import { RESTAURANT_FRAGMENT } from '../../fragments';
 import { restaurantsPageQuery, restaurantsPageQueryVariables } from '../../__generated__/restaurantsPageQuery';
 
 const RESTAURANTS_QUERY = gql`
@@ -24,17 +26,11 @@ const RESTAURANTS_QUERY = gql`
       totalPages
       totalResults
       results {
-        id
-        name
-        coverImg
-        category {
-          name
-        }
-        address
-        isPromoted
+        ...RestaurantParts
       }
     }
   }
+  ${RESTAURANT_FRAGMENT}
 `;
 
 interface IFormProps {
@@ -67,6 +63,9 @@ export const Restaurants = () => {
 
   return (
     <div>
+      <Helmet>
+        <title>Home | Nuber Eats</title>
+      </Helmet>
       <form onSubmit={handleSubmit(onSearchSubmit)} className="bg-gray-800 w-full py-40 flex items-center justify-center">
         <input
           ref={register({ required: true, min: 3 })}
@@ -80,7 +79,7 @@ export const Restaurants = () => {
         <div className="max-w-screen-2xl pb-20 mx-auto mt-8">
           <div className="flex justify-around max-w-sm mx-auto">
             {data?.allCategories.categories?.map((category, index) => (
-              <div className="flex flex-col items-center rounded-full cursor-pointer hover:text-gray-500" key={index}>
+              <div className="flex flex-col items-center rounded-full cursor-pointer hover:text-gray-500" key={category.id}>
                 <div
                   className="w-16 h-16 bg-cover rounded-full"
                   style={{ backgroundImage: `url(${category.coverImg})` }}
