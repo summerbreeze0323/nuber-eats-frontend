@@ -1,5 +1,6 @@
 import { gql, useApolloClient, useMutation } from '@apollo/client';
 import React, { useEffect } from 'react';
+import { useHistory } from 'react-router';
 import { useMe } from '../../hooks/useMe';
 import { verifyEmail, verifyEmailVariables } from '../../__generated__/verifyEmail';
 
@@ -15,10 +16,8 @@ const VERIFY_EMAIL_MUTATION = gql`
 export const ConfirmEmail = () => {
   const { data: userData } = useMe();
   const client = useApolloClient();
+  const history = useHistory();
   const onCompleted = (data: verifyEmail) => {
-    console.log('onCompleted')
-    console.log(data)
-    console.log(data.verifyEmail)
     const { verifyEmail: { ok } } = data;
 
     // Edit apollo cache
@@ -26,12 +25,13 @@ export const ConfirmEmail = () => {
       client.writeFragment({
         id: `User:${userData.me.id}`,
         fragment: gql`
-          fragment VerifyedUser on User {
+          fragment VerifiedUser on User {
             verified
           }
         `,
-        data: { verified: true }
+        data: { verified: true },
       });
+      history.push('/');
     };
   };
 
@@ -42,12 +42,12 @@ export const ConfirmEmail = () => {
 
   useEffect(() => {
     const [_, code] = window.location.href.split('code=');
-    // verifyEmail({
-    //   variables: {
-    //     input: { code }
-    //   }
-    // });
-  }, []);
+    verifyEmail({
+      variables: {
+        input: { code }
+      }
+    });
+  }, [verifyEmail]);
 
   return (
     <div className="mt-52 flex flex-col items-center justify-center">
