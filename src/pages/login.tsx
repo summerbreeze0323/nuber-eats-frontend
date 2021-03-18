@@ -10,7 +10,7 @@ import { Link } from 'react-router-dom';
 import { authTokenVal, isLoggedInVal } from '../apollo';
 import { LOCALSTORAGE_TOKEN } from '../constants';
 
-const LOGIN_MUTATION = gql`
+export const LOGIN_MUTATION = gql`
   mutation login($loginInput: LoginInput!) {
     login(input: $loginInput) {
       ok
