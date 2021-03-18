@@ -1,5 +1,7 @@
 import { gql, useQuery } from '@apollo/client';
 import React, { useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { useHistory } from 'react-router';
 import { Restaurant } from '../../components/restaurant';
 import { restaurantsPageQuery, restaurantsPageQueryVariables } from '../../__generated__/restaurantsPageQuery';
 
@@ -35,6 +37,10 @@ const RESTAURANTS_QUERY = gql`
   }
 `;
 
+interface IFormProps {
+  searchTerm: string;
+}
+
 export const Restaurants = () => {
   const [page, setPage] = useState(1);
   const { data, loading } = useQuery<
@@ -49,13 +55,24 @@ export const Restaurants = () => {
   });
   const onNextPageClick = () => setPage((current) => current + 1);
   const onPrevPageClick = () => setPage((current) => current - 1);
+  const { register, handleSubmit, getValues } = useForm<IFormProps>();
+  const history = useHistory();
+  const onSearchSubmit = () => {
+    const { searchTerm } = getValues();
+    history.push({
+      pathname: '/search',
+      search: `?term=${searchTerm}`
+    });
+  };
 
   return (
     <div>
-      <form className="bg-gray-800 w-full py-40 flex items-center justify-center">
+      <form onSubmit={handleSubmit(onSearchSubmit)} className="bg-gray-800 w-full py-40 flex items-center justify-center">
         <input
+          ref={register({ required: true, min: 3 })}
+          name="searchTerm"
           type="Search"
-          className="input rounded-md border-0 w-3/12"
+          className="input rounded-md border-0 w-3/4 md:w-3/12"
           placeholder="Search restaurants..."
         />
       </form>
@@ -75,7 +92,7 @@ export const Restaurants = () => {
               </div>
             ))}
           </div>
-          <div className="grid mt-16 grid-cols-3 gap-x-5 gap-y-10">
+          <div className="grid mt-16 md:grid-cols-3 gap-x-5 gap-y-10">
             {data?.restaurants.results?.map((restaurant, index) => (
               <Restaurant
                 key={index}
