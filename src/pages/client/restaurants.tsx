@@ -94,12 +94,12 @@ export const Restaurants = () => {
           <div className="grid mt-16 md:grid-cols-3 gap-x-5 gap-y-10">
             {data?.restaurants.results?.map((restaurant, index) => (
               <Restaurant
-                key={index}
-                id={restaurant.id + ''}
-                name={restaurant.name}
-                coverImg={restaurant.coverImg}
-                categoryName={restaurant.category?.name}
-              />
+              key={index}
+              id={restaurant.id + ''}
+              name={restaurant.name}
+              coverImg={restaurant.coverImg}
+              categoryName={restaurant.category?.name}
+            />
             ))}
           </div>
           <div className="grid grid-cols-3 text-center max-w-md items-center mx-auto mt-10">
