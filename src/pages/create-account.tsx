@@ -9,7 +9,7 @@ import { FormError } from '../components/form-error';
 import { UserRole } from '../__generated__/globalTypes';
 import { createAccountMutation, createAccountMutationVariables } from '../__generated__/createAccountMutation';
 
-const CREATE_ACCOUNT_MUTATION = gql`
+export const CREATE_ACCOUNT_MUTATION = gql`
   mutation createAccountMutation($createAccountInput: CreateAccountInput!) {
     createAccount(input: $createAccountInput) {
       ok
@@ -41,7 +41,10 @@ export const CreateAccount = () => {
   const history = useHistory();
   const onCompleted = (data: createAccountMutation) => {
     const { createAccount: { ok } } = data;
-    if (ok) history.push('/');
+    if (ok) {
+      alert('Account Created! Log in now!');
+      history.push('/');
+    }
   }
   const [
     createAccountMutation, { loading, data: createAccountMutationResult }
@@ -66,7 +69,7 @@ export const CreateAccount = () => {
         <title>Create Account | Nuber Eats</title>
       </Helmet>
       <div className="w-full max-w-screen-sm flex flex-col px-5 items-center">
-        <img src={nuberLogo} className="w-52 mb-10" alt="nuber logo" />
+        <img src={nuberLogo} className="w-52 mb-10" alt="Nuber Eats" />
         <h4 className="w-full font-medium text-left text-3xl mb-5">Let's get started</h4>
         <form
           onSubmit={handleSubmit(onSubmit)}
@@ -82,8 +85,11 @@ export const CreateAccount = () => {
             className="input"
             placeholder="Email"
           />
+          {errors.email?.message && (
+            <FormError errorMessage={errors.email?.message} />
+          )}
           {errors.email?.type === 'pattern' && (
-            <FormError errorMessage={"Place enter a valid email"} />
+            <FormError errorMessage={"Please enter a valid email"} />
           )}
           <input
             ref={register({required: "Password is required"})}
