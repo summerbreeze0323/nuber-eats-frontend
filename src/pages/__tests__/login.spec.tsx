@@ -51,7 +51,7 @@ describe('<Login/>', () => {
   });
 
   it('display password required errors', async () => {
-    const { getByPlaceholderText, debug, getByRole } = renderResult;
+    const { getByPlaceholderText, getByRole } = renderResult;
     const email = getByPlaceholderText(/email/i);
     const submitBtn = getByRole('button');
     await waitFor(() => {
@@ -64,7 +64,7 @@ describe('<Login/>', () => {
   });
   
   it('submits form and calls mutation', async () => {
-    const { getByPlaceholderText, debug, getByRole } = renderResult;
+    const { getByPlaceholderText, getByRole } = renderResult;
     const email = getByPlaceholderText(/email/i);
     const password = getByPlaceholderText(/password/i);
     const submitBtn = getByRole('button');
