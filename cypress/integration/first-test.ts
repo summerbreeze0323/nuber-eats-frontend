@@ -1,24 +1,36 @@
-describe('Log In', () => {
-  it('should see login page', () => {
-    cy.visit('/').title().should('eq', 'Login | Nuber Eats');
+describe("Log In", () => {
+  const user = cy;
+
+  it("should see login page", () => {
+    user.visit("/").title().should("eq", "Login | Nuber Eats");
   });
 
-  it('can fill out the form', () => {
-    cy.visit('/')
-      .findByPlaceholderText(/email/i)
-      .type('julee@naver.com')
+  it("can see email / password validation errors", () => {
+    user.visit("/");
+    user.findByPlaceholderText(/email/i).type("bad@email");
+    user.findByRole("alert").should("have.text", "Please enter a valid email");
+    user.findByPlaceholderText(/email/i).clear();
+    user.findByRole("alert").should("have.text", "Email is required");
+    user.findByPlaceholderText(/email/i).type("bad@email.com");
+    user
       .findByPlaceholderText(/password/i)
-      .type('123')
-      .findByRole('button')
-      .should('not.have.class', 'pointer-events-none')
-      // to do (can log in)
+      .type("a")
+      .clear();
+    user.findByRole("alert").should("have.text", "Password is required");
   });
-  
-  it('can see email / password validation errors', () => {
-    cy.visit('/')
-      .findByPlaceholderText(/email/i)
-      .type('bad@email')
-      .findByRole('button')
-      .should('have.text', 'Please enter a valid email')
+
+  it("can fill out the form", () => {
+    user.visit("/");
+    user.findByPlaceholderText(/email/i).type("julee0323@naver.com");
+    user.findByPlaceholderText(/password/i).type("12345");
+    user
+      .findByRole("button")
+      .should("not.have.class", "pointer-events-none")
+      .click();
+    user.window().its("localStorage.nuber-token").should("be.a", "string");
+  });
+
+  it("Sign Up", () => {
+    user.visit("create-account");
   });
 });
