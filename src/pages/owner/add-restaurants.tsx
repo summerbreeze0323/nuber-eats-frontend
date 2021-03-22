@@ -5,12 +5,14 @@ import { useForm } from 'react-hook-form';
 import { Button } from '../../components/button';
 import { FormError } from '../../components/form-error';
 import { createRestaurant, createRestaurantVariables } from '../../__generated__/createRestaurant';
+import { MY_RESTAURANTS_QUERY } from "./my-restaurants";
 
 const CREATE_RESTAURANT_MUTATION = gql`
   mutation createRestaurant($input: CreateRestaurantInput!) {
     createRestaurant(input: $input) {
       ok
       error
+      restaurantId
     }
   }
 `;
@@ -26,7 +28,7 @@ export const AddRestaurant = () => {
   const [uploading, setUploading] = useState(false);
 
   const onCompleted = (data: createRestaurant) => {
-    const { createRestaurant: { ok } } = data;
+    const { createRestaurant: { ok, restaurantId } } = data;
     if (ok) setUploading(false);
   }
   const [createRestaurantMutation, { loading, data }] = useMutation<
