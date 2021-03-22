@@ -13,6 +13,13 @@ describe("Edit Profile", () => {
   });
 
   it("can change email", () => {
+    user.intercept("POST", "http://localhost:4000/graphql", (req) => {
+      if (req.body?.operationName === "editProfile") {
+        // @ts-ignore
+        req.body?.variables?.input?.email = "julee0323@naver.com";
+      }
+    });
+
     user.visit("/edit-profile");
     user.findByPlaceholderText(/email/i).clear().type("juleenew@naver.com");
     user.findByRole("button").click();
