@@ -6,6 +6,7 @@ import { Dish } from '../../components/dish';
 import { RESTAURANT_FRAGMENT, DISH_FRAGMENT } from '../../fragments';
 import { restaurant, restaurantVariables } from '../../__generated__/restaurant';
 import { CreateOrderItemInput } from '../../__generated__/globalTypes';
+import { DishOption } from '../../components/dish-option';
 
 const RESTAURANT_QUERY = gql`
   query restaurant($input: RestaurantInput!) {
@@ -66,21 +67,39 @@ export const Restaurant = () => {
   const removeFromOrder = (dishId: number) => {
     setOrderItems((current) => current.filter(dish => dish.dishId !== dishId));
   };
-  const addOptionToItem = (dishId: number, option: any) => {
+  const addOptionToItem = (dishId: number, optionName: string) => {
     if (!isSelected(dishId)) return;
 
     const oldItem = getItem(dishId);
     if (oldItem) {
       const hasOption = Boolean(
-        oldItem.options?.find(aOption => aOption.name === option.name)
+        oldItem.options?.find(aOption => aOption.name === optionName)
       );
       if (!hasOption) {
         removeFromOrder(dishId);
         setOrderItems(current => [
-          { dishId, options: [option, ...oldItem.options!] },
+          { dishId, options: [{name: optionName}, ...oldItem.options!] },
           ...current
         ]);
       }
+    }
+  };
+  const removeOptionFromItem = (dishId: number, optionName: string) => {
+    if (!isSelected(dishId)) return;
+
+    const oldItem = getItem(dishId);
+    if(oldItem) {
+      removeFromOrder(dishId);
+      setOrderItems(current => [
+        {
+          dishId,
+          options: oldItem.options?.filter(
+            (option) => option.name !== optionName
+          )
+        },
+        ...current
+      ]);
+      return;
     }
   };
   const getOptionsFromItem = (
@@ -95,6 +114,7 @@ export const Restaurant = () => {
     if (item) {
       return Boolean(getOptionsFromItem(item, optionName));
     }
+    return false;
   };
   console.log(orderItems);
 
@@ -139,19 +159,15 @@ export const Restaurant = () => {
               removeFromOrder={removeFromOrder}
             >
               {dish.options?.map((option, index) => (
-                <span
+                <DishOption
                   key={index}
-                  className={`flex border item-center ${isOptionSelected(dish.id, option.name) ? 'border-gray-800' : ''}`}
-                  onClick={() =>
-                    addOptionToItem
-                      ? addOptionToItem(dish.id, {
-                          name: option.name
-                        })
-                      : null}
-                >
-                  <h6 className="mr-2">{option.name}</h6>
-                  <h6 className="text-sm opacity-75">(${option.extra})</h6>
-                </span>
+                  dishId={dish.id}
+                  isSelected={isOptionSelected(dish.id, option.name)}
+                  name={option.name}
+                  extra={option.extra}
+                  addOptionToItem={addOptionToItem}
+                  removeOptionFromItem={removeOptionFromItem}
+                />
               ))}
             </Dish>  
           ))}
