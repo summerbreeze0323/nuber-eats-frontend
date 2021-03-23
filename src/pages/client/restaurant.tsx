@@ -1,12 +1,13 @@
-import { gql, useQuery } from '@apollo/client';
+import { gql, useMutation, useQuery } from '@apollo/client';
 import React, {useState} from 'react';
 import { Helmet } from 'react-helmet-async';
-import { useParams } from 'react-router';
+import { useHistory, useParams } from 'react-router';
 import { Dish } from '../../components/dish';
 import { RESTAURANT_FRAGMENT, DISH_FRAGMENT } from '../../fragments';
 import { restaurant, restaurantVariables } from '../../__generated__/restaurant';
 import { CreateOrderItemInput } from '../../__generated__/globalTypes';
 import { DishOption } from '../../components/dish-option';
+import { createOrder, createOrderVariables } from '../../__generated__/createOrder';
 
 const RESTAURANT_QUERY = gql`
   query restaurant($input: RestaurantInput!) {
@@ -30,6 +31,7 @@ const CREATE_ORDER_MUTATION = gql`
     createOrder(input: $input) {
       ok
       error
+      orderId
     }
   }
 `;
@@ -51,8 +53,47 @@ export const Restaurant = () => {
 
   const [orderStarted, setOrderStarted] = useState(false);
   const [orderItems, setOrderItems] = useState<CreateOrderItemInput[]>([]);
-  const tiggerStartOrder = () => {
+  const triggerStartOrder = () => {
     setOrderStarted(true);
+  }
+  const triggerCancelOrder = () => {
+    setOrderStarted(false);
+    setOrderItems([]);
+  }
+  const history = useHistory();
+  const onCompleted = (data: createOrder) => {
+    const {
+      createOrder: { ok, orderId },
+    } = data;
+    if (data.createOrder.ok) {
+      history.push(`/orders/${orderId}`);
+    }
+  };
+  const [createOrderMutation, { loading: placingOrder }] = useMutation<
+    createOrder,
+    createOrderVariables
+  >(CREATE_ORDER_MUTATION, {
+    onCompleted,
+  });
+  const triggerConfirmOrder = () => {
+    if (placingOrder) {
+       return;
+     }
+    if (orderItems.length === 0) {
+      alert("Can't place empty order");
+      return;
+    }
+    const ok = window.confirm('You are about to place an order');
+    if (ok) {
+      createOrderMutation({
+        variables: {
+          input: {
+            restaurantId: +params.id,
+            items: orderItems,
+          },
+        },
+      });
+    }
   }
   const getItem = (dishId: number) => {
     return orderItems.find(order => order.dishId === dishId);
@@ -140,9 +181,21 @@ export const Restaurant = () => {
         </div>
       </div>
       <div className="container pb-32 flex flex-col items-end mt-20">
-        <button className="btn px-10" onClick={tiggerStartOrder}>
-          {orderStarted? 'Ordering' : 'Start Order'}
-        </button>
+        {!orderStarted && (
+          <button className="btn px-10" onClick={triggerStartOrder}>
+            Start Order
+          </button>
+        )}
+        {orderStarted && (
+          <div className="flex items-center">
+            <button className="btn px-10" onClick={triggerConfirmOrder}>
+              Confirm Order
+            </button>
+            <button className="btn px-10 bg-black hover:bg-black" onClick={triggerCancelOrder}>
+              Cancel Order
+            </button>
+          </div>
+        )}
         <div className="w-full grid mt-16 md:grid-cols-3 gap-x-5 gap-y-10">
           {data?.restaurant.restaurant?.menu.map((dish) => (
             <Dish
