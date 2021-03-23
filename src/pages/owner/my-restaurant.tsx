@@ -1,7 +1,13 @@
 import { gql, useQuery } from '@apollo/client';
 import React from 'react';
 import { Helmet } from 'react-helmet-async';
-import { VictoryAxis, VictoryBar, VictoryChart } from "victory";
+import {
+  VictoryAxis,
+  VictoryBar,
+  VictoryChart,
+  VictoryLabel,
+  VictoryPie,
+} from "victory";
 import { useParams } from 'react-router';
 import { Link } from 'react-router-dom';
 import { Dish } from '../../components/dish';
@@ -42,6 +48,21 @@ export const MyRestaurant = () => {
     }
   );
   console.log(data)
+
+  const chartData = [
+    { x: 1, y: 3000 },
+    { x: 2, y: 1500 },
+    { x: 3, y: 4250 },
+    { x: 4, y: 1250 },
+    { x: 5, y: 2300 },
+    { x: 6, y: 7150 },
+    { x: 7, y: 6830 },
+    { x: 8, y: 6830 },
+    { x: 9, y: 6830 },
+    { x: 10, y: 6830 },
+    { x: 11, y: 6830 },
+  ];
+
   return (
     <div>
       <Helmet>
@@ -87,22 +108,10 @@ export const MyRestaurant = () => {
         <div className="mt-20 mb-10">
           <h4 className="text-center text-2xl font-medium">Sales</h4>
           <div className=" max-w-lg w-full mx-auto">
-            <VictoryChart domainPadding={20}>
-              <VictoryAxis
-                label="Amount of Money"
-                dependentAxis
-                tickValues={[20, 30, 40, 50, 60]}
-              />
-              <VictoryAxis label="Days of Life" />
-              <VictoryBar
-                data={[
-                  { x: 10, y: 20 },
-                  { x: 20, y: 5 },
-                  { x: 35, y: 55 },
-                  { x: 45, y: 99 },
-                ]}
-              />
-            </VictoryChart>
+            <VictoryPie
+              data={chartData}
+              colorScale={["tomato", "orange", "gold", "cyan", "navy"]}
+            />
           </div>
         </div>
       </div>
