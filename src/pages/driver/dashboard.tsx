@@ -52,6 +52,41 @@ export const Dashboard = () => {
     setMaps(maps);
   };
 
+  // Google API를 이용해서 경로 만들기
+  const onGetRouteClick = () => {
+    if (map) {
+      const directionsService = new google.maps.DirectionsService();
+      const directionsRenderer = new google.maps.DirectionsRenderer({
+        // polylineOptions: {
+        //   strokeColor: '#000',
+        //   strokeOpacity: 1,
+        //   strokeWeight: 5
+        // }
+      });
+      directionsRenderer.setMap(map);
+      directionsService.route(
+        {
+          origin: {
+            location: new google.maps.LatLng(
+              driverCoords.lat,
+              driverCoords.lng,
+            )
+          },
+          destination: {
+            location: new google.maps.LatLng(
+              driverCoords.lat + 0.05,
+              driverCoords.lng + 0.05,
+            )
+          },
+          travelMode: google.maps.TravelMode.TRANSIT
+        },
+        (result) => {
+          directionsRenderer.setDirections(result);
+        }
+      )
+    }
+  }
+
   return (
     <div>
       <div className="overflow-hidden" style={{width: window.innerWidth, height: '50vh'}}>
@@ -59,13 +94,12 @@ export const Dashboard = () => {
           yesIWantToUseGoogleMapApiInternals
           onGoogleApiLoaded={onApiLoaded}
           defaultZoom={16}
-          draggable={false}
+          draggable={true}
           defaultCenter={{lat: 36.58, lng: 125.95}}
           bootstrapURLKeys={{ key: 'AIzaSyB_hBJq6YemWYKFq_2KqoVLzCjgW6Da7WU' }}
-        >
-          <Driver lat={driverCoords.lat} lng={driverCoords.lng} />
-        </GoogleMapReact>
+        ></GoogleMapReact>
       </div>
+      <button onClick={onGetRouteClick}>Get route</button>
     </div>
   );
 }
