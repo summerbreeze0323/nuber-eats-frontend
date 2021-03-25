@@ -1,23 +1,21 @@
-import { gql, useQuery, useSubscription } from '@apollo/client';
-import React, {useEffect} from 'react';
-import { Helmet } from 'react-helmet-async';
+import { gql, useMutation, useQuery, useSubscription } from "@apollo/client";
+import React, { useEffect } from "react";
+import { Helmet } from "react-helmet-async";
+import { Link, useHistory, useParams } from "react-router-dom";
+import { Dish } from "../../components/dish";
 import {
   VictoryAxis,
-  VictoryBar,
   VictoryChart,
   VictoryLabel,
+  VictoryLine,
   VictoryPie,
   VictoryTheme,
-  VictoryLine,
+  VictoryTooltip,
   VictoryVoronoiContainer,
-  VictoryTooltip
 } from "victory";
-import { useHistory, useParams } from 'react-router';
-import { Link } from 'react-router-dom';
-import { Dish } from '../../components/dish';
-import { DISH_FRAGMENT, RESTAURANT_FRAGMENT, ORDERS_FRAGMENT, FULL_ORDER_FRAGMENT } from '../../fragments';
-import { myRestaurant, myRestaurantVariables } from '../../__generated__/myRestaurant';
-import { pendingOrders } from '../../__generated__/pendingOrders';
+import { DISH_FRAGMENT, RESTAURANT_FRAGMENT, ORDERS_FRAGMENT, FULL_ORDER_FRAGMENT } from "../../fragments";
+import { myRestaurant, myRestaurantVariables } from "../../__generated__/myRestaurant";
+import { pendingOrders } from "../../__generated__/pendingOrders";
 
 export const MY_RESTAURANT_QUERY = gql`
   query myRestaurant($input: MyRestaurantInput!) {
@@ -65,7 +63,6 @@ export const MyRestaurant = () => {
       }
     }
   );
-
   const { data: subscriptionData } = useSubscription<pendingOrders>(PENDING_ORDERS_SUBSCRIPTION);
   const history = useHistory();
   useEffect(() => {
@@ -73,7 +70,6 @@ export const MyRestaurant = () => {
       history.push(`/orders/${subscriptionData.pendingOrders.id}`);
     }
   }, [subscriptionData]);
-
   return (
     <div>
       <Helmet>
@@ -97,22 +93,19 @@ export const MyRestaurant = () => {
         >
           Add Dish &rarr;
         </Link>
-        <Link to={``} className=" text-white bg-lime-700 py-3 px-10">
-          Buy Promotion &rarr;
-        </Link>
         <div className="mt-10">
           {data?.myRestaurant.restaurant?.menu.length === 0 ? (
             <h4 className="text-xl mb-5">Please upload a dish!</h4>
           ) : (
-              <div className="grid mt-16 md:grid-cols-3 gap-x-5 gap-y-10">
-                {data?.myRestaurant.restaurant?.menu.map((dish) => (
-                  <Dish
-                    key={dish.id}
-                    name={dish.name}
-                    price={dish.price}
-                    description={dish.description}
-                  />
-                ))}
+            <div className="grid mt-16 md:grid-cols-3 gap-x-5 gap-y-10">
+              {data?.myRestaurant.restaurant?.menu.map((dish, index) => (
+                <Dish
+                  key={index}
+                  name={dish.name}
+                  description={dish.description}
+                  price={dish.price}
+                />
+              ))}
             </div>
           )}
         </div>
@@ -145,16 +138,6 @@ export const MyRestaurant = () => {
                     strokeWidth: 5,
                   },
                 }}
-              />
-              <VictoryAxis
-                style={{
-                  tickLabels: {
-                    fontSize: 20,
-                    fill: '#4D7C0F'
-                  } as any
-                }}
-                dependentAxis
-                tickFormat={(tick) => `$${tick}`}
               />
               <VictoryAxis
                 tickLabelComponent={<VictoryLabel renderInPortal />}

@@ -157,7 +157,7 @@ export const Restaurant = () => {
     }
     return false;
   };
-  console.log(orderItems);
+  // console.log(orderItems);
 
   return (
     <div>
